@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">音量键控制播放</string>
+    <string name="accessibilityName">音量键控制播放</string>
+    <string name="description">唯有开启此无障碍服务，程序才能够监听到音量键事件。</string>
+</resources>
