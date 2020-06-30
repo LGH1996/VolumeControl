@@ -1,14 +1,20 @@
 package com.lgh.volume.control;
 
 import android.accessibilityservice.AccessibilityService;
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.media.AudioManager;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.KeyEvent;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -16,8 +22,10 @@ import java.util.concurrent.TimeUnit;
 
 public class MyMainFunction {
 
-    private AccessibilityService service;
     private static String TAG = "MyAccessibilityService";
+
+    public SettingData settingData;
+    private AccessibilityService service;
     private boolean double_press;
     private boolean isUpPress, isDownPress;
     private long star_up, star_down;
@@ -27,24 +35,37 @@ public class MyMainFunction {
     private boolean isPlayPause;
     private ScheduledFuture future_v;
     private ScheduledExecutorService executorService;
-    private MediaButtonControl mediaButtonControl;
     private AudioManager audioManager;
     private Vibrator vibrator;
-    private int vibration_strength;
-    private MyScreenOffReceiver screenOffReceiver;
+    private MyScreenOnOffReceiver screenOffReceiver;
+    private MyInstallerReceiver installerReceiver;
+    private AccessibilityServiceInfo serviceInfo;
+    private Set<String> PlayerSet;
 
-    public MyMainFunction(AccessibilityService service){
+    public MyMainFunction(AccessibilityService service) {
         this.service = service;
     }
 
-    void onConnect(){
-        executorService = Executors.newSingleThreadScheduledExecutor();
-        mediaButtonControl = new MediaButtonControl(service);
+    void onConnect() {
+
         audioManager = (AudioManager) service.getSystemService(Context.AUDIO_SERVICE);
         vibrator = (Vibrator) service.getSystemService(Context.VIBRATOR_SERVICE);
-        vibration_strength = 50;
-        screenOffReceiver = new MyScreenOffReceiver();
-        service.registerReceiver(screenOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+        executorService = Executors.newSingleThreadScheduledExecutor();
+        serviceInfo = service.getServiceInfo();
+        settingData = new SettingData(service);
+        screenOffReceiver = new MyScreenOnOffReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        service.registerReceiver(screenOffReceiver, intentFilter);
+        installerReceiver = new MyInstallerReceiver();
+        IntentFilter filterInstall = new IntentFilter();
+        filterInstall.addAction(Intent.ACTION_PACKAGE_ADDED);
+        filterInstall.addAction(Intent.ACTION_PACKAGE_FULLY_REMOVED);
+        filterInstall.addDataScheme("package");
+        service.registerReceiver(installerReceiver, filterInstall);
+        setInOnOff(settingData.onOff);
+        updatePlayerSet();
         future_v = executorService.schedule(new Runnable() {
             @Override
             public void run() {
@@ -52,181 +73,127 @@ public class MyMainFunction {
         }, 0, TimeUnit.MILLISECONDS);
     }
 
-    boolean onKeyEvent(KeyEvent event){
+    boolean onKeyEvent(KeyEvent event) {
 //        Log.i(TAG, KeyEvent.keyCodeToString(event.getKeyCode())+"-"+event.getAction());
+        if (settingData.model == 1) {
+            return model_1(event);
+        }
+        if (settingData.model == 2) {
+            return model_2(event);
+        }
+        return false;
+    }
+
+    void onUnBind() {
+        service.unregisterReceiver(screenOffReceiver);
+        service.unregisterReceiver(installerReceiver);
+    }
+
+    void setInScreenOnOff(boolean b) {
+        if (settingData.onOff && settingData.onlyEffectInScreenOff) {
+            setRealOnOff(!b);
+        }
+    }
+
+    void setInOnOff(boolean onOff) {
+        if (!settingData.onlyEffectInScreenOff) {
+            setRealOnOff(onOff);
+        }
+    }
+
+    void setInOnlyEffectInScreenOffOnOff(boolean b) {
+        if (settingData.onOff) {
+            setRealOnOff(!b);
+        }
+    }
+
+
+    void setRealOnOff(boolean onOff) {
+        if (onOff) {
+            serviceInfo.flags |= AccessibilityServiceInfo.FLAG_REQUEST_FILTER_KEY_EVENTS;
+        } else {
+            serviceInfo.flags &= ~AccessibilityServiceInfo.FLAG_REQUEST_FILTER_KEY_EVENTS;
+        }
+        service.setServiceInfo(serviceInfo);
+    }
+
+    boolean model_1(KeyEvent event) {
         try {
             switch (event.getKeyCode()) {
-//                case KeyEvent.KEYCODE_VOLUME_UP:
-//                    switch (event.getAction()) {
-//                        case KeyEvent.ACTION_DOWN:
-//                            Log.i(TAG,"KeyEvent.KEYCODE_VOLUME_UP -> KeyEvent.ACTION_DOWN");
-//                            if (!audioManager.isMusicActive()){
-//                                return false;
-//                            }
-//                            star_up = System.currentTimeMillis();
-//                            is_release_up = false;
-//                            double_press = false;
-//                            if (is_release_down) {
-//                                future_v = executorService.schedule(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        Log.i(TAG,"KeyEvent.KEYCODE_VOLUME_UP -> THREAD");
-//                                        if (!is_release_down) {
-//                                            mediaButtonControl.play_pause_Music();
-//                                            vibrator.vibrate(vibration_strength);
-//                                        } else if (!is_release_up ) {
-//                                            mediaButtonControl.nextMusic();
-//                                            vibrator.vibrate(vibration_strength);
-//                                        }
-//                                    }
-//                                }, 800, TimeUnit.MILLISECONDS);
-//                            } else {
-//                                double_press = true;
-//                            }
-//                            break;
-//                        case KeyEvent.ACTION_UP:
-//                            Log.i(TAG,"KeyEvent.KEYCODE_VOLUME_UP -> KeyEvent.ACTION_UP");
-//                            future_v.cancel(false);
-//                            is_release_up = true;
-//                            if (!double_press && System.currentTimeMillis() - star_up < 800) {
-//                                audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
-//                            }
-//                            break;
-//                    }
-//                    return true;
-//                case KeyEvent.KEYCODE_VOLUME_DOWN:
-//                    switch (event.getAction()) {
-//                        case KeyEvent.ACTION_DOWN:
-//                            Log.i(TAG,"KeyEvent.KEYCODE_VOLUME_DOWN -> KeyEvent.ACTION_DOWN");
-//                            if (!audioManager.isMusicActive()){
-//                                return false;
-//                            }
-//                            star_down = System.currentTimeMillis();
-//                            is_release_down = false;
-//                            double_press = false;
-//                            if (is_release_up) {
-//                                future_v = executorService.schedule(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        Log.i(TAG,"KeyEvent.KEYCODE_VOLUME_DOWN -> THREAD");
-//                                        if (!is_release_up) {
-//                                            mediaButtonControl.play_pause_Music();
-//                                            vibrator.vibrate(vibration_strength);
-//                                        } else if (!is_release_down) {
-//                                            mediaButtonControl.previousMusic();
-//                                            vibrator.vibrate(vibration_strength);
-//                                        }
-//                                    }
-//                                }, 800, TimeUnit.MILLISECONDS);
-//
-//                            } else {
-//                                double_press = true;
-//                            }
-//                            break;
-//                        case KeyEvent.ACTION_UP:
-//                            Log.i(TAG,"KeyEvent.KEYCODE_VOLUME_DOWN -> KeyEvent.ACTION_UP");
-//                            future_v.cancel(false);
-//                            is_release_down = true;
-//                            if (!double_press && System.currentTimeMillis() - star_down < 800) {
-//                                audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
-//                            }
-//                            break;
-//                    }
-//                    return true;
-//                default:
-////                    Log.i(TAG,KeyEvent.keyCodeToString(event.getKeyCode()));
-//                    return false;
-                case KeyEvent.KEYCODE_VOLUME_DOWN:
-
-                   if (event.getAction()==KeyEvent.ACTION_DOWN ){
-                       Log.i(TAG,"KeyEvent.KEYCODE_VOLUME_DOWN");
-                       if (isUpPress){
-                           mediaButtonControl.play_pause_Music();
-                           vibrator.vibrate(vibration_strength);
-                           isPlayPause = true;
-                           Log.i(TAG,"fffffffffffffffffffffffffffff");
-                           return true;
-                       }
-
-                       if (!isBegin) {
-                           executorService.schedule(new Runnable() {
-                               @Override
-                               public void run() {
-                                   if (!isPlayPause){
-
-                                       if (clickCount==0 || !audioManager.isMusicActive()) {
-                                           audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
-                                       } else {
-                                           mediaButtonControl.previousMusic();
-                                           vibrator.vibrate(vibration_strength);
-                                       }
-
-                                   }
-                                   isPlayPause = false;
-                                   isBegin = false;
-                                   isDownPress = false;
-                                   clickCount =0;
-                               }
-                           }, 200, TimeUnit.MILLISECONDS);
-                           isBegin = true;
-                           isDownPress= true;
-                       }
-
-                       long curTimeDown = event.getEventTime();
-                       if ((curTimeDown - interval)<200){
-                           clickCount++;
-                       }
-
-                       interval = curTimeDown;
-                       return true;
-                   }
-
                 case KeyEvent.KEYCODE_VOLUME_UP:
-                    if (event.getAction()==KeyEvent.ACTION_DOWN ){
-                        Log.i(TAG,"KeyEvent.KEYCODE_VOLUME_UP");
-                        if (isDownPress){
-                            mediaButtonControl.play_pause_Music();
-                            vibrator.vibrate(vibration_strength);
-                            isPlayPause = true;
-                            Log.i(TAG,"fffffffffffffffffffffffffffff");
-                            return true;
-                        }
-
-
-                        if (!isBegin){
-                            executorService.schedule(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (!isPlayPause){
-                                        if (clickCount ==0 ||  !audioManager.isMusicActive()) {
-                                        audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
-                                    } else {
-                                        mediaButtonControl.nextMusic();
-                                        vibrator.vibrate(vibration_strength);
-                                    }
-
-                                    }
-                                    isPlayPause = false;
-                                    isBegin = false;
-                                    isUpPress = false;
-                                    clickCount = 0;
-                                }
-                            }, 200, TimeUnit.MILLISECONDS);
-                            isBegin = true;
+                    switch (event.getAction()) {
+                        case KeyEvent.ACTION_DOWN:
+//                            Log.i(TAG, "KeyEvent.KEYCODE_VOLUME_UP -> KeyEvent.ACTION_DOWN");
+                            star_up = event.getEventTime();
                             isUpPress = true;
-                        }
-
-                        long curTimeUp = event.getEventTime();
-                        if ((curTimeUp - interval)<200){
-                            clickCount++;
-                        }
-
-                        interval = curTimeUp;
-                        return true;
+                            double_press = false;
+                            if (!isDownPress) {
+                                future_v = executorService.schedule(new Runnable() {
+                                    @Override
+                                    public void run() {
+//                                        Log.i(TAG, "KeyEvent.KEYCODE_VOLUME_UP -> THREAD");
+                                        if (isDownPress) {
+                                            sendMediaButton(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
+                                            vibrator.vibrate(settingData.vibrationStrength);
+                                        } else if (isUpPress && audioManager.isMusicActive()) {
+                                            sendMediaButton(KeyEvent.KEYCODE_MEDIA_NEXT);
+                                            vibrator.vibrate(settingData.vibrationStrength);
+                                        }
+                                    }
+                                }, 800, TimeUnit.MILLISECONDS);
+                            } else {
+                                double_press = true;
+                            }
+                            break;
+                        case KeyEvent.ACTION_UP:
+//                            Log.i(TAG, "KeyEvent.KEYCODE_VOLUME_UP -> KeyEvent.ACTION_UP");
+                            future_v.cancel(false);
+                            isUpPress = false;
+                            if (!double_press && event.getEventTime() - star_up < 800) {
+                                audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+                            }
+                            break;
                     }
+                    return true;
+                case KeyEvent.KEYCODE_VOLUME_DOWN:
+                    switch (event.getAction()) {
+                        case KeyEvent.ACTION_DOWN:
+//                            Log.i(TAG, "KeyEvent.KEYCODE_VOLUME_DOWN -> KeyEvent.ACTION_DOWN");
+                            star_down = event.getEventTime();
+                            isDownPress = true;
+                            double_press = false;
+                            if (!isUpPress) {
+                                future_v = executorService.schedule(new Runnable() {
+                                    @Override
+                                    public void run() {
+//                                        Log.i(TAG, "KeyEvent.KEYCODE_VOLUME_DOWN -> THREAD");
+                                        if (isUpPress) {
+                                            sendMediaButton(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
+                                            vibrator.vibrate(settingData.vibrationStrength);
+                                        } else if (isDownPress && audioManager.isMusicActive()) {
+                                            sendMediaButton(KeyEvent.KEYCODE_MEDIA_PREVIOUS);
+                                            vibrator.vibrate(settingData.vibrationStrength);
+                                        }
+                                    }
+                                }, 800, TimeUnit.MILLISECONDS);
 
-                    default:
-                        return false;
+                            } else {
+                                double_press = true;
+                            }
+                            break;
+                        case KeyEvent.ACTION_UP:
+//                            Log.i(TAG, "KeyEvent.KEYCODE_VOLUME_DOWN -> KeyEvent.ACTION_UP");
+                            future_v.cancel(false);
+                            isDownPress = false;
+                            if (!double_press && event.getEventTime() - star_down < 800) {
+                                audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+                            }
+                            break;
+                    }
+                    return true;
+                default:
+//                    Log.i(TAG,KeyEvent.keyCodeToString(event.getKeyCode()));
+                    return false;
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -234,110 +201,88 @@ public class MyMainFunction {
         }
     }
 
-    void onUnBind(){
-        service.unregisterReceiver(screenOffReceiver);
-    }
-
-    void onScreenOff(){
-
-    }
-
-    void model_1(){
-
-    }
-
-    boolean model_2(KeyEvent event){
+    boolean model_2(KeyEvent event) {
         try {
             switch (event.getKeyCode()) {
                 case KeyEvent.KEYCODE_VOLUME_DOWN:
-
-                    if (event.getAction()==KeyEvent.ACTION_DOWN ){
-                        Log.i(TAG,"KeyEvent.KEYCODE_VOLUME_DOWN");
-                        if (isUpPress){
-                            mediaButtonControl.play_pause_Music();
-                            vibrator.vibrate(vibration_strength);
+                    if (event.getAction() == KeyEvent.ACTION_UP) {
+//                        Log.i(TAG, "KeyEvent.KEYCODE_VOLUME_DOWN");
+                        if (isUpPress) {
+                            sendMediaButton(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
+                            vibrator.vibrate(settingData.vibrationStrength);
                             isPlayPause = true;
-                            Log.i(TAG,"fffffffffffffffffffffffffffff");
-                            return true;
-                        }
-
-                        if (!isBegin) {
-                            executorService.schedule(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (!isPlayPause){
-
-                                        if (clickCount==0 || !audioManager.isMusicActive()) {
-                                            audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
-                                        } else {
-                                            mediaButtonControl.previousMusic();
-                                            vibrator.vibrate(vibration_strength);
+                        } else {
+                            if (!isBegin) {
+                                executorService.schedule(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (!isPlayPause) {
+                                            if (clickCount == 0 || !audioManager.isMusicActive()) {
+                                                audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+                                            } else {
+                                                sendMediaButton(KeyEvent.KEYCODE_MEDIA_PREVIOUS);
+                                                vibrator.vibrate(settingData.vibrationStrength);
+                                            }
                                         }
-
+                                        isPlayPause = false;
+                                        isBegin = false;
+                                        isDownPress = false;
+                                        clickCount = 0;
                                     }
-                                    isPlayPause = false;
-                                    isBegin = false;
-                                    isDownPress = false;
-                                    clickCount =0;
-                                }
-                            }, 200, TimeUnit.MILLISECONDS);
-                            isBegin = true;
-                            isDownPress= true;
-                        }
+                                }, 350, TimeUnit.MILLISECONDS);
+                                isBegin = true;
+                                isDownPress = true;
+                            }
 
-                        long curTimeDown = event.getEventTime();
-                        if ((curTimeDown - interval)<200){
-                            clickCount++;
-                        }
+                            long curTimeDown = event.getEventTime();
+                            if ((curTimeDown - interval) < 350) {
+                                clickCount++;
+                            }
 
-                        interval = curTimeDown;
-                        return true;
+                            interval = curTimeDown;
+                        }
                     }
-
+                    return true;
                 case KeyEvent.KEYCODE_VOLUME_UP:
-                    if (event.getAction()==KeyEvent.ACTION_DOWN ){
-                        Log.i(TAG,"KeyEvent.KEYCODE_VOLUME_UP");
-                        if (isDownPress){
-                            mediaButtonControl.play_pause_Music();
-                            vibrator.vibrate(vibration_strength);
+                    if (event.getAction() == KeyEvent.ACTION_UP) {
+//                        Log.i(TAG, "KeyEvent.KEYCODE_VOLUME_UP");
+                        if (isDownPress) {
+                            sendMediaButton(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
+                            vibrator.vibrate(settingData.vibrationStrength);
                             isPlayPause = true;
-                            Log.i(TAG,"fffffffffffffffffffffffffffff");
-                            return true;
-                        }
-
-
-                        if (!isBegin){
-                            executorService.schedule(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (!isPlayPause){
-                                        if (clickCount ==0 ||  !audioManager.isMusicActive()) {
-                                            audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
-                                        } else {
-                                            mediaButtonControl.nextMusic();
-                                            vibrator.vibrate(vibration_strength);
+                        } else {
+                            if (!isBegin) {
+                                executorService.schedule(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (!isPlayPause) {
+                                            if (clickCount == 0 || !audioManager.isMusicActive()) {
+                                                audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+                                            } else {
+                                                sendMediaButton(KeyEvent.KEYCODE_MEDIA_NEXT);
+                                                vibrator.vibrate(settingData.vibrationStrength);
+                                            }
                                         }
-
+                                        isPlayPause = false;
+                                        isBegin = false;
+                                        isUpPress = false;
+                                        clickCount = 0;
                                     }
-                                    isPlayPause = false;
-                                    isBegin = false;
-                                    isUpPress = false;
-                                    clickCount = 0;
-                                }
-                            }, 200, TimeUnit.MILLISECONDS);
-                            isBegin = true;
-                            isUpPress = true;
-                        }
+                                }, 350, TimeUnit.MILLISECONDS);
+                                isBegin = true;
+                                isUpPress = true;
+                            }
 
-                        long curTimeUp = event.getEventTime();
-                        if ((curTimeUp - interval)<200){
-                            clickCount++;
-                        }
+                            long curTimeUp = event.getEventTime();
+                            if ((curTimeUp - interval) < 350) {
+                                clickCount++;
+                            }
 
-                        interval = curTimeUp;
-                        return true;
+                            interval = curTimeUp;
+
+                        }
                     }
-
+                    return true;
                 default:
                     return false;
             }
@@ -345,5 +290,36 @@ public class MyMainFunction {
             e.printStackTrace();
             return false;
         }
-            }
     }
+
+    private void sendMediaButton(int keycode) {
+        Intent downIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+        KeyEvent downEvent = new KeyEvent(KeyEvent.ACTION_DOWN, keycode);
+        downIntent.putExtra(Intent.EXTRA_KEY_EVENT, downEvent);
+        Intent upIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+        KeyEvent upEvent = new KeyEvent(KeyEvent.ACTION_UP, keycode);
+        upIntent.putExtra(Intent.EXTRA_KEY_EVENT, upEvent);
+        if (settingData.supportSysPlayer) {
+            service.sendOrderedBroadcast(downIntent, null);
+            service.sendOrderedBroadcast(upIntent, null);
+            return;
+        }
+        for (String e : PlayerSet) {
+            downIntent.setPackage(e);
+            service.sendOrderedBroadcast(downIntent, null);
+            upIntent.setPackage(e);
+            service.sendOrderedBroadcast(upIntent, null);
+        }
+    }
+
+    public void updatePlayerSet() {
+        PlayerSet = new HashSet<>();
+        List<ResolveInfo> list = service.getPackageManager().queryBroadcastReceivers(new Intent(Intent.ACTION_MEDIA_BUTTON), PackageManager.MATCH_ALL);
+        for (ResolveInfo e : list) {
+            ApplicationInfo applicationInfo = e.activityInfo.applicationInfo;
+            if ((applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != ApplicationInfo.FLAG_SYSTEM) {
+                PlayerSet.add(applicationInfo.packageName);
+            }
+        }
+    }
+}

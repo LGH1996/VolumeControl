@@ -1,5 +1,8 @@
 <resources>
-    <string name="app_name">音量键控制播放</string>
-    <string name="accessibilityName">音量键控制播放</string>
-    <string name="description">唯有开启此无障碍服务，程序才能够监听到音量键事件。</string>
+    <string name="app_name">音乐播放控制器</string>
+    <string name="accessibilityName">音乐播放控制器</string>
+    <string name="description">只有开启此无障碍服务，程序才能够监听并响应到音量键事件。</string>
+    <string name="authorizationQuestion">
+       说明：\n为了保证应用能够稳定运行，除了需要开启以上的权限外，你还需要在任务列表中把该页面锁定，并把一切可能将其后台杀死的限制解除，比如设置为允许后台运行、允许开机自启、加入内存清理白名单等等。\n\n模式一：\n长按音量上键－>下一首，长按音量下键－>上一首，同时长按音量上下键－>暂停或播放。\n\n模式二：\n双击音量上键－>下一首，双击音量下键－>上一首，同时按下音量上下键－>暂停或播放。
+    </string>
 </resources>

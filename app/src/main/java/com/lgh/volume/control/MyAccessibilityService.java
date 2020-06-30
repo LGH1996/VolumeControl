@@ -8,7 +8,7 @@ import android.view.accessibility.AccessibilityEvent;
 
 public class MyAccessibilityService extends AccessibilityService {
 
-   public static MyMainFunction mainFunction;
+    public static MyMainFunction mainFunction;
 
     @Override
     protected void onServiceConnected() {
@@ -18,7 +18,7 @@ public class MyAccessibilityService extends AccessibilityService {
     }
 
     public boolean onKeyEvent(KeyEvent event) {
-      return mainFunction.onKeyEvent(event);
+        return mainFunction.onKeyEvent(event);
     }
 
     @Override
