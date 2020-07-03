@@ -12,10 +12,6 @@
         android:roundIcon="@drawable/app"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
-        <receiver
-            android:name=".MyInstallerReceiver"
-            android:enabled="true"
-            android:exported="true"></receiver>
 
         <activity android:name=".MainActivity">
             <intent-filter>

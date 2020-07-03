@@ -320,31 +320,6 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginEnd="5dp"
-                        android:text="添加对系统音乐播放器的支持:"
-                        android:textColor="@color/textColor"
-                        android:textSize="15sp" />
-
-                    <Switch
-                        android:id="@+id/supportSysPlayer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:thumb="@drawable/switch_custom_thumb_selector"
-                        android:track="@drawable/switch_custom_track_selector" />
-                </RelativeLayout>
-
-                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"

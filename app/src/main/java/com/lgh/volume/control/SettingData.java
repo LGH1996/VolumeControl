@@ -10,7 +10,6 @@ public class SettingData {
     public static String SETTING_VIBRATION_STRENGTH = "Setting.Vibration.Strength";
     public static String SETTING_AUTO_HIDE_IN_TASK = "Setting.Auto.Hide.In.Task";
     public static String SETTING_ONLY_EFFECT_IN_SCREEN_OFF = "Setting.Only.Effect.In.Screen.Off";
-    public static String SETTING_SUPPORT_SYSTEM_PLAYER = "Setting.Support.System.Player";
 
     public SharedPreferences sharedPreferences;
     public boolean onOff;
@@ -18,7 +17,6 @@ public class SettingData {
     public int vibrationStrength;
     public boolean autoHideInTask;
     public boolean onlyEffectInScreenOff;
-    public boolean supportSysPlayer;
 
     public SettingData(Context context) {
         sharedPreferences = context.getSharedPreferences(SETTING_DATA, Context.MODE_PRIVATE);
@@ -27,7 +25,6 @@ public class SettingData {
         vibrationStrength = sharedPreferences.getInt(SETTING_VIBRATION_STRENGTH, 50);
         autoHideInTask = sharedPreferences.getBoolean(SETTING_AUTO_HIDE_IN_TASK, true);
         onlyEffectInScreenOff = sharedPreferences.getBoolean(SETTING_ONLY_EFFECT_IN_SCREEN_OFF, false);
-        supportSysPlayer = sharedPreferences.getBoolean(SETTING_SUPPORT_SYSTEM_PLAYER, false);
     }
 
     public void setOnOff(boolean onOff) {
@@ -59,10 +56,5 @@ public class SettingData {
         if (MyAccessibilityService.mainFunction != null) {
             MyAccessibilityService.mainFunction.setInOnlyEffectInScreenOffOnOff(onlyEffectInScreenOff);
         }
-    }
-
-    public void setSupportSysPlayer(boolean supportSysPlayer) {
-        this.supportSysPlayer = supportSysPlayer;
-        sharedPreferences.edit().putBoolean(SETTING_SUPPORT_SYSTEM_PLAYER, supportSysPlayer).apply();
     }
 }

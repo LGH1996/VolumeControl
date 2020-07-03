@@ -5,24 +5,17 @@ import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
+
 import android.media.AudioManager;
 import android.os.Vibrator;
 import android.view.KeyEvent;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class MyMainFunction {
-
-    private static String TAG = "MyAccessibilityService";
 
     public SettingData settingData;
     private AccessibilityService service;
@@ -38,9 +31,7 @@ public class MyMainFunction {
     private AudioManager audioManager;
     private Vibrator vibrator;
     private MyScreenOnOffReceiver screenOffReceiver;
-    private MyInstallerReceiver installerReceiver;
     private AccessibilityServiceInfo serviceInfo;
-    private Set<String> PlayerSet;
 
     public MyMainFunction(AccessibilityService service) {
         this.service = service;
@@ -58,14 +49,7 @@ public class MyMainFunction {
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
         service.registerReceiver(screenOffReceiver, intentFilter);
-        installerReceiver = new MyInstallerReceiver();
-        IntentFilter filterInstall = new IntentFilter();
-        filterInstall.addAction(Intent.ACTION_PACKAGE_ADDED);
-        filterInstall.addAction(Intent.ACTION_PACKAGE_FULLY_REMOVED);
-        filterInstall.addDataScheme("package");
-        service.registerReceiver(installerReceiver, filterInstall);
         setInOnOff(settingData.onOff);
-        updatePlayerSet();
         future_v = executorService.schedule(new Runnable() {
             @Override
             public void run() {
@@ -86,7 +70,6 @@ public class MyMainFunction {
 
     void onUnBind() {
         service.unregisterReceiver(screenOffReceiver);
-        service.unregisterReceiver(installerReceiver);
     }
 
     void setInScreenOnOff(boolean b) {
@@ -293,33 +276,9 @@ public class MyMainFunction {
     }
 
     private void sendMediaButton(int keycode) {
-        Intent downIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
         KeyEvent downEvent = new KeyEvent(KeyEvent.ACTION_DOWN, keycode);
-        downIntent.putExtra(Intent.EXTRA_KEY_EVENT, downEvent);
-        Intent upIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+        audioManager.dispatchMediaKeyEvent(downEvent);
         KeyEvent upEvent = new KeyEvent(KeyEvent.ACTION_UP, keycode);
-        upIntent.putExtra(Intent.EXTRA_KEY_EVENT, upEvent);
-        if (settingData.supportSysPlayer) {
-            service.sendOrderedBroadcast(downIntent, null);
-            service.sendOrderedBroadcast(upIntent, null);
-            return;
-        }
-        for (String e : PlayerSet) {
-            downIntent.setPackage(e);
-            service.sendOrderedBroadcast(downIntent, null);
-            upIntent.setPackage(e);
-            service.sendOrderedBroadcast(upIntent, null);
-        }
-    }
-
-    public void updatePlayerSet() {
-        PlayerSet = new HashSet<>();
-        List<ResolveInfo> list = service.getPackageManager().queryBroadcastReceivers(new Intent(Intent.ACTION_MEDIA_BUTTON), PackageManager.MATCH_ALL);
-        for (ResolveInfo e : list) {
-            ApplicationInfo applicationInfo = e.activityInfo.applicationInfo;
-            if ((applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != ApplicationInfo.FLAG_SYSTEM) {
-                PlayerSet.add(applicationInfo.packageName);
-            }
-        }
+        audioManager.dispatchMediaKeyEvent(upEvent);
     }
 }

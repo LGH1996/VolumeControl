@@ -14,7 +14,6 @@ public class MyAccessibilityService extends AccessibilityService {
     protected void onServiceConnected() {
         mainFunction = new MyMainFunction(this);
         mainFunction.onConnect();
-
     }
 
     public boolean onKeyEvent(KeyEvent event) {

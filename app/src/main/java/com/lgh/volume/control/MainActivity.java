@@ -30,7 +30,6 @@ public class MainActivity extends Activity {
     CheckBox model_1;
     CheckBox model_2;
     Switch onlyEffectInScreenOff;
-    Switch supportSysPlayer;
     Switch autoHideInTask;
     SeekBar vibrationStrength;
 
@@ -102,11 +101,9 @@ public class MainActivity extends Activity {
 
         allOnOff = findViewById(R.id.on_off_switch);
         onlyEffectInScreenOff = findViewById(R.id.onlyEffectInScreenOff);
-        supportSysPlayer = findViewById(R.id.supportSysPlayer);
         autoHideInTask = findViewById(R.id.autoHideInTask);
         allOnOff.setChecked(settingData.onOff);
         onlyEffectInScreenOff.setChecked(settingData.onlyEffectInScreenOff);
-        supportSysPlayer.setChecked(settingData.supportSysPlayer);
         autoHideInTask.setChecked(settingData.autoHideInTask);
         CompoundButton.OnCheckedChangeListener settingCheck = new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -118,9 +115,6 @@ public class MainActivity extends Activity {
                     case R.id.onlyEffectInScreenOff:
                         settingData.setOnlyEffectInScreenOff(isChecked);
                         break;
-                    case R.id.supportSysPlayer:
-                        settingData.setSupportSysPlayer(isChecked);
-                        break;
                     case R.id.autoHideInTask:
                         settingData.setAutoHideInTask(isChecked);
                         break;
@@ -129,7 +123,6 @@ public class MainActivity extends Activity {
         };
         allOnOff.setOnCheckedChangeListener(settingCheck);
         onlyEffectInScreenOff.setOnCheckedChangeListener(settingCheck);
-        supportSysPlayer.setOnCheckedChangeListener(settingCheck);
         autoHideInTask.setOnCheckedChangeListener(settingCheck);
 
         vibrationStrength = findViewById(R.id.vibrationStrength);
