@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -173,5 +174,13 @@ public class MainActivity extends Activity {
         if (settingData.autoHideInTask && inCurPage) {
             finishAndRemoveTask();
         }
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && settingData.autoHideInTask) {
+            finishAndRemoveTask();
+        }
+        return super.onKeyUp(keyCode, event);
     }
 }
