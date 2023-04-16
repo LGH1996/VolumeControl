@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ffeeeeee"
+    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
     <ScrollView
@@ -17,30 +18,28 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
-                android:id="@+id/layout_authority"
+                android:id="@+id/ll_authority"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:background="@drawable/box"
                 android:orientation="vertical"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
+                android:paddingVertical="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <RelativeLayout
-                    android:id="@+id/accessibility_on_off"
+                    android:id="@+id/rl_accessibility_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:background="@drawable/item_click"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp">
+                    android:paddingHorizontal="15dp">
 
                     <ImageView
-                        android:id="@+id/accessibility_on_off_img"
+                        android:id="@+id/iv_accessibility_on_off_img"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_alignParentStart="true"
@@ -51,8 +50,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/accessibility_forward"
-                        android:layout_toEndOf="@id/accessibility_on_off_img"
+                        android:layout_toStartOf="@id/iv_accessibility_forward"
+                        android:layout_toEndOf="@id/iv_accessibility_on_off_img"
                         android:gravity="center_vertical|start"
                         android:paddingStart="15dp"
                         android:paddingEnd="15dp"
@@ -62,7 +61,7 @@
                         android:textSize="15sp" />
 
                     <ImageView
-                        android:id="@+id/accessibility_forward"
+                        android:id="@+id/iv_accessibility_forward"
                         android:layout_width="15dp"
                         android:layout_height="15dp"
                         android:layout_alignParentEnd="true"
@@ -74,17 +73,16 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/batteryIgnore_on_off"
+                    android:id="@+id/rl_device_admin_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:background="@drawable/item_click"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp">
+                    android:paddingHorizontal="15dp">
 
                     <ImageView
-                        android:id="@+id/batteryIgnore_on_off_img"
+                        android:id="@+id/iv_device_admin_on_off_img"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_alignParentStart="true"
@@ -95,8 +93,51 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/batteryIgnore_forward"
-                        android:layout_toEndOf="@id/batteryIgnore_on_off_img"
+                        android:layout_toStartOf="@id/iv_device_admin_forward"
+                        android:layout_toEndOf="@id/iv_device_admin_on_off_img"
+                        android:gravity="center_vertical|start"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:singleLine="true"
+                        android:text="设备管理器权限"
+                        android:textColor="@color/textColor"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:id="@+id/iv_device_admin_forward"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:alpha="0.5"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:src="@drawable/forward" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/rl_batteryIgnore_on_off"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@drawable/item_click"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="15dp">
+
+                    <ImageView
+                        android:id="@+id/iv_batteryIgnore_on_off_img"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ok" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/iv_batteryIgnore_forward"
+                        android:layout_toEndOf="@id/iv_batteryIgnore_on_off_img"
                         android:gravity="center_vertical|start"
                         android:paddingStart="15dp"
                         android:paddingEnd="15dp"
@@ -106,7 +147,7 @@
                         android:textSize="15sp" />
 
                     <ImageView
-                        android:id="@+id/batteryIgnore_forward"
+                        android:id="@+id/iv_batteryIgnore_forward"
                         android:layout_width="15dp"
                         android:layout_height="15dp"
                         android:layout_alignParentEnd="true"
@@ -118,17 +159,16 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/app_detail"
+                    android:id="@+id/rl_app_detail"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:background="@drawable/item_click"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp">
+                    android:paddingHorizontal="15dp">
 
                     <ImageView
-                        android:id="@+id/app_detail_img"
+                        android:id="@+id/iv_app_detail_img"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_alignParentStart="true"
@@ -139,18 +179,18 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/detail_forward"
-                        android:layout_toEndOf="@id/app_detail_img"
+                        android:layout_toStartOf="@id/iv_detail_forward"
+                        android:layout_toEndOf="@id/iv_app_detail_img"
                         android:gravity="center_vertical|start"
                         android:paddingStart="15dp"
                         android:paddingEnd="15dp"
                         android:singleLine="true"
-                        android:text="应用详情页面"
+                        android:text="应用详情管理页面"
                         android:textColor="@color/textColor"
                         android:textSize="15sp" />
 
                     <ImageView
-                        android:id="@+id/detail_forward"
+                        android:id="@+id/iv_detail_forward"
                         android:layout_width="15dp"
                         android:layout_height="15dp"
                         android:layout_alignParentEnd="true"
@@ -163,135 +203,40 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/layout_setting"
+                android:id="@+id/ll_setting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:background="@drawable/box"
                 android:orientation="vertical"
-                android:padding="10dp"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_authority">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
-                        android:id="@+id/m1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/m2"
-                        app:layout_constraintHorizontal_chainStyle="spread_inside"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="该程序总开关:"
-                            android:textColor="@color/textColor"
-                            android:textSize="15sp" />
-
-                        <Switch
-                            android:id="@+id/on_off_switch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="5dp"
-                            android:thumb="@drawable/switch_custom_thumb_selector"
-                            android:track="@drawable/switch_custom_track_selector" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/m2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/m3"
-                        app:layout_constraintStart_toEndOf="@+id/m1"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="5dp"
-                            android:text="模式一:"
-                            android:textColor="@color/textColor"
-                            android:textSize="15sp" />
-
-                        <CheckBox
-                            android:id="@+id/model_1"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="center_vertical"
-                            android:background="@drawable/check_select"
-                            android:button="@null"
-                            android:gravity="center" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/m3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/m2"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="5dp"
-                            android:text="模式二:"
-                            android:textColor="@color/textColor"
-                            android:textSize="15sp" />
-
-                        <CheckBox
-                            android:id="@+id/model_2"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_gravity="center_vertical"
-                            android:background="@drawable/check_select"
-                            android:button="@null"
-                            android:gravity="center" />
-                    </LinearLayout>
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintTop_toBottomOf="@id/ll_authority">
 
                 <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:orientation="horizontal">
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/a"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_marginEnd="5dp"
-                        android:text="振动反馈强度:"
+                        android:text="开关:"
                         android:textColor="@color/textColor"
                         android:textSize="15sp" />
 
-                    <SeekBar
-                        android:id="@+id/vibrationStrength"
-                        android:layout_width="match_parent"
+                    <Switch
+                        android:id="@+id/sc_on_off"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:layout_toEndOf="@+id/a"
-                        android:max="100"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="0dp"
-                        android:progressDrawable="@drawable/seek_bar_bg"
-                        android:splitTrack="false"
-                        android:thumb="@drawable/seek_bar_thumb"
-                        android:thumbOffset="0dp" />
+                        android:thumb="@drawable/switch_custom_thumb_selector"
+                        android:track="@drawable/switch_custom_track_selector" />
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -310,7 +255,7 @@
                         android:textSize="15sp" />
 
                     <Switch
-                        android:id="@+id/onlyEffectInScreenOff"
+                        android:id="@+id/sc_only_effect_in_screen_off"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_alignParentEnd="true"
@@ -336,7 +281,7 @@
                         android:textSize="15sp" />
 
                     <Switch
-                        android:id="@+id/autoHideInTask"
+                        android:id="@+id/sc_auto_hide_in_task"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_alignParentEnd="true"
@@ -344,30 +289,96 @@
                         android:thumb="@drawable/switch_custom_thumb_selector"
                         android:track="@drawable/switch_custom_track_selector" />
                 </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_long_press_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="5dp"
+                        android:text="长按触发时长:"
+                        android:textColor="@color/textColor"
+                        android:textSize="15sp" />
+
+                    <SeekBar
+                        android:id="@+id/sb_long_press_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@+id/tv_long_press_time"
+                        android:max="2000"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="0dp"
+                        android:progressDrawable="@drawable/seek_bar_bg"
+                        android:splitTrack="false"
+                        android:thumb="@drawable/seek_bar_thumb"
+                        android:thumbOffset="0dp" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_vibration_strength"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="5dp"
+                        android:text="振动反馈强度:"
+                        android:textColor="@color/textColor"
+                        android:textSize="15sp" />
+
+                    <SeekBar
+                        android:id="@+id/sb_vibration_strength"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@+id/tv_vibration_strength"
+                        android:max="100"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="0dp"
+                        android:progressDrawable="@drawable/seek_bar_bg"
+                        android:splitTrack="false"
+                        android:thumb="@drawable/seek_bar_thumb"
+                        android:thumbOffset="0dp" />
+                </RelativeLayout>
 
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/layout_explain"
+                android:id="@+id/ll_explain"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:background="@drawable/box"
                 android:orientation="vertical"
-                android:padding="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/layout_setting">
+                app:layout_constraintTop_toBottomOf="@+id/ll_setting">
 
-                <TextView
+                <me.codeboy.android.aligntextview.AlignTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:lineSpacingMultiplier="1.5"
+                    android:layout_marginHorizontal="15dp"
+                    android:layout_marginVertical="20dp"
                     android:text="@string/authorizationQuestion" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/layout_support"
+                android:id="@+id/ll_support"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
@@ -376,7 +387,7 @@
                 android:padding="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/layout_explain">
+                app:layout_constraintTop_toBottomOf="@+id/ll_explain">
 
                 <ImageView
                     android:layout_width="match_parent"

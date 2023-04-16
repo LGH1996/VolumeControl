@@ -1,134 +1,113 @@
 package com.lgh.volume.control;
 
-import android.app.Activity;
-import android.content.Context;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
-import android.widget.Switch;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+import androidx.appcompat.app.AppCompatActivity;
 
-    Context context;
+import com.lgh.volume.control.databinding.ActivityMainBinding;
 
-    RelativeLayout accessibilityOnOff;
-    RelativeLayout batteryIgnore;
-    RelativeLayout appDetail;
-    ImageView accessibilityOnOffImg;
-    ImageView batteryIgnoreOnOffImg;
+public class MainActivity extends AppCompatActivity {
 
-    Switch allOnOff;
-    CheckBox model_1;
-    CheckBox model_2;
-    Switch onlyEffectInScreenOff;
-    Switch autoHideInTask;
-    SeekBar vibrationStrength;
-
-    SettingData settingData;
-    boolean inCurPage;
+    private ActivityMainBinding binding;
+    private SettingData settingData;
+    private boolean inCurPage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        context = getApplicationContext();
-        settingData = MyAccessibilityService.mainFunction != null ? MyAccessibilityService.mainFunction.settingData : new SettingData(context);
-
-        accessibilityOnOff = findViewById(R.id.accessibility_on_off);
-        batteryIgnore = findViewById(R.id.batteryIgnore_on_off);
-        appDetail = findViewById(R.id.app_detail);
-        accessibilityOnOffImg = findViewById(R.id.accessibility_on_off_img);
-        batteryIgnoreOnOffImg = findViewById(R.id.batteryIgnore_on_off_img);
-        View.OnClickListener authorityOnOff = new View.OnClickListener() {
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        binding.rlAccessibilityOnOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.accessibility_on_off:
-                        Intent intentAccessibility = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-                        startActivity(intentAccessibility);
-                        inCurPage = false;
-                        break;
-                    case R.id.batteryIgnore_on_off:
-                        if (((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName())) {
-                            Toast.makeText(context, "忽略电池优化权限已打开", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Intent intentBatteryIgnore = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + getPackageName()));
-                            startActivity(intentBatteryIgnore);
-                        }
-                        break;
-                    case R.id.app_detail:
-                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName()));
-                        startActivity(intent);
-                        inCurPage = false;
-                        break;
+                Intent intentAccessibility = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                if (intentAccessibility.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intentAccessibility);
+                    inCurPage = false;
+                } else {
+                    Toast.makeText(getApplicationContext(), "授权窗口打开失败，请手动打开", Toast.LENGTH_SHORT).show();
                 }
             }
-        };
-        accessibilityOnOff.setOnClickListener(authorityOnOff);
-        batteryIgnore.setOnClickListener(authorityOnOff);
-        appDetail.setOnClickListener(authorityOnOff);
-
-        model_1 = findViewById(R.id.model_1);
-        model_2 = findViewById(R.id.model_2);
-        model_1.setChecked(settingData.model == 1);
-        model_2.setChecked(settingData.model == 2);
-        View.OnClickListener modelClick = new View.OnClickListener() {
+        });
+        binding.rlDeviceAdminOnOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (v.getId() == R.id.model_1) {
-                    settingData.setModel(1);
-                    model_1.setChecked(true);
-                    model_2.setChecked(false);
-                }
-                if (v.getId() == R.id.model_2) {
-                    settingData.setModel(2);
-                    model_2.setChecked(true);
-                    model_1.setChecked(false);
+                DevicePolicyManager devicePolicyManager = getSystemService(DevicePolicyManager.class);
+                ComponentName compMyDeviceAdmin = new ComponentName(getApplicationContext(), MyDeviceAdminReceiver.class);
+                if (devicePolicyManager.isAdminActive(compMyDeviceAdmin)) {
+                    Toast.makeText(getApplicationContext(), "设备管理器权限已开启", Toast.LENGTH_SHORT).show();
+                } else {
+                    Intent intentDeviceAdmin = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+                    intentDeviceAdmin.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, compMyDeviceAdmin);
+                    if (intentDeviceAdmin.resolveActivity(getPackageManager()) != null) {
+                        startActivity(intentDeviceAdmin);
+                        inCurPage = false;
+                    } else {
+                        Toast.makeText(getApplicationContext(), "授权窗口打开失败，请手动打开", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
-        };
-        model_1.setOnClickListener(modelClick);
-        model_2.setOnClickListener(modelClick);
+        });
+        binding.rlBatteryIgnoreOnOff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (getSystemService(PowerManager.class).isIgnoringBatteryOptimizations(getPackageName())) {
+                    Toast.makeText(getApplicationContext(), "忽略电池优化权限已开启", Toast.LENGTH_SHORT).show();
+                } else {
+                    Intent intentBatteryIgnore = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + getPackageName()));
+                    if (intentBatteryIgnore.resolveActivity(getPackageManager()) != null) {
+                        startActivity(intentBatteryIgnore);
+                        inCurPage = false;
+                    } else {
+                        Toast.makeText(getApplicationContext(), "授权窗口打开失败，请手动打开", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+        binding.rlAppDetail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName()));
+                startActivity(intent);
+                inCurPage = false;
+            }
+        });
 
-        allOnOff = findViewById(R.id.on_off_switch);
-        onlyEffectInScreenOff = findViewById(R.id.onlyEffectInScreenOff);
-        autoHideInTask = findViewById(R.id.autoHideInTask);
-        allOnOff.setChecked(settingData.onOff);
-        onlyEffectInScreenOff.setChecked(settingData.onlyEffectInScreenOff);
-        autoHideInTask.setChecked(settingData.autoHideInTask);
-        CompoundButton.OnCheckedChangeListener settingCheck = new CompoundButton.OnCheckedChangeListener() {
+        binding.scOnOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                switch (buttonView.getId()) {
-                    case R.id.on_off_switch:
-                        settingData.setOnOff(isChecked);
-                        break;
-                    case R.id.onlyEffectInScreenOff:
-                        settingData.setOnlyEffectInScreenOff(isChecked);
-                        break;
-                    case R.id.autoHideInTask:
-                        settingData.setAutoHideInTask(isChecked);
-                        break;
-                }
+                settingData.setOnOff(isChecked);
             }
-        };
-        allOnOff.setOnCheckedChangeListener(settingCheck);
-        onlyEffectInScreenOff.setOnCheckedChangeListener(settingCheck);
-        autoHideInTask.setOnCheckedChangeListener(settingCheck);
+        });
 
-        vibrationStrength = findViewById(R.id.vibrationStrength);
-        vibrationStrength.setProgress(settingData.vibrationStrength);
-        vibrationStrength.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        binding.scOnlyEffectInScreenOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                settingData.setOnlyEffectInScreenOff(isChecked);
+            }
+        });
+
+        binding.scAutoHideInTask.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                settingData.setAutoHideInTask(isChecked);
+            }
+        });
+
+        binding.sbVibrationStrength.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
@@ -145,21 +124,57 @@ public class MainActivity extends Activity {
             }
         });
 
+        binding.sbLongPressTime.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                settingData.setLongPressTime(seekBar.getProgress());
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (MyAccessibilityService.mainFunction == null) {
-            accessibilityOnOffImg.setImageResource(R.drawable.error);
-        } else {
-            accessibilityOnOffImg.setImageResource(R.drawable.ok);
-        }
-        if (((PowerManager) getSystemService(POWER_SERVICE)).isIgnoringBatteryOptimizations(getPackageName())) {
-            batteryIgnoreOnOffImg.setImageResource(R.drawable.ok);
-        } else {
-            batteryIgnoreOnOffImg.setImageResource(R.drawable.error);
-        }
+        settingData = MyAccessibilityService.myMainFunction != null ? MyAccessibilityService.myMainFunction.getSettingData() : new SettingData(getApplicationContext());
+        binding.scOnOff.setChecked(settingData.onOff);
+        binding.scOnlyEffectInScreenOff.setChecked(settingData.onlyEffectInScreenOff);
+        binding.scAutoHideInTask.setChecked(settingData.autoHideInTask);
+        binding.sbVibrationStrength.setProgress(settingData.vibrationStrength);
+        binding.sbLongPressTime.setProgress(settingData.longPressTime);
+
+        Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (MyAccessibilityService.myMainFunction == null) {
+                    binding.ivAccessibilityOnOffImg.setImageResource(R.drawable.error);
+                } else {
+                    binding.ivAccessibilityOnOffImg.setImageResource(R.drawable.ok);
+                }
+                if (getSystemService(DevicePolicyManager.class).isAdminActive(new ComponentName(getApplicationContext(), MyDeviceAdminReceiver.class))) {
+                    binding.ivDeviceAdminOnOffImg.setImageResource(R.drawable.ok);
+                } else {
+                    binding.ivDeviceAdminOnOffImg.setImageResource(R.drawable.error);
+                }
+                if (getSystemService(PowerManager.class).isIgnoringBatteryOptimizations(getPackageName())) {
+                    binding.ivBatteryIgnoreOnOffImg.setImageResource(R.drawable.ok);
+                } else {
+                    binding.ivBatteryIgnoreOnOffImg.setImageResource(R.drawable.error);
+                }
+                handler.postDelayed(this, 500);
+            }
+        });
+
     }
 
     @Override

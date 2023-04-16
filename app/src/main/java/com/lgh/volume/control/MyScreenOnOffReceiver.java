@@ -8,20 +8,18 @@ public class MyScreenOnOffReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // TODO: This method is called when the BroadcastReceiver is receiving
-        // an Intent broadcast.
         try {
             String action = intent.getAction();
-            if (action != null && MyAccessibilityService.mainFunction != null) {
+            if (action != null && MyAccessibilityService.myMainFunction != null) {
                 if (action.equals(Intent.ACTION_SCREEN_ON)) {
-                    MyAccessibilityService.mainFunction.setInScreenOnOff(true);
+                    MyAccessibilityService.myMainFunction.setInScreenOnOff(true);
                 }
                 if (action.equals(Intent.ACTION_SCREEN_OFF)) {
-                    MyAccessibilityService.mainFunction.setInScreenOnOff(false);
+                    MyAccessibilityService.myMainFunction.setInScreenOnOff(false);
                 }
             }
         } catch (Throwable e) {
-//            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 }

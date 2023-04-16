@@ -8,22 +8,21 @@ import android.view.accessibility.AccessibilityEvent;
 
 public class MyAccessibilityService extends AccessibilityService {
 
-    public static MyMainFunction mainFunction;
+    public static MyMainFunction myMainFunction;
 
     @Override
     protected void onServiceConnected() {
-        mainFunction = new MyMainFunction(this);
-        mainFunction.onConnect();
+        myMainFunction = new MyMainFunction(this);
     }
 
     public boolean onKeyEvent(KeyEvent event) {
-        return mainFunction.onKeyEvent(event);
+        return myMainFunction.onKeyEvent(event);
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        mainFunction.onUnBind();
-        mainFunction = null;
+        myMainFunction.onUnBind();
+        myMainFunction = null;
         return super.onUnbind(intent);
     }
 

@@ -6,43 +6,33 @@ import android.content.SharedPreferences;
 public class SettingData {
     public static String SETTING_DATA = "Setting.Data";
     public static String SETTING_ON_OFF = "Setting.On.Off";
-    public static String SETTING_MODEL = "Setting.Model";
-    public static String SETTING_VIBRATION_STRENGTH = "Setting.Vibration.Strength";
     public static String SETTING_AUTO_HIDE_IN_TASK = "Setting.Auto.Hide.In.Task";
     public static String SETTING_ONLY_EFFECT_IN_SCREEN_OFF = "Setting.Only.Effect.In.Screen.Off";
+    public static String SETTING_VIBRATION_STRENGTH = "Setting.Vibration.Strength";
+    public static String SETTING_LONG_PRESS_TIME = "Setting.Long.Press.Time";
 
     public SharedPreferences sharedPreferences;
     public boolean onOff;
-    public int model;
-    public int vibrationStrength;
     public boolean autoHideInTask;
     public boolean onlyEffectInScreenOff;
+    public int vibrationStrength;
+    public int longPressTime;
 
     public SettingData(Context context) {
         sharedPreferences = context.getSharedPreferences(SETTING_DATA, Context.MODE_PRIVATE);
         onOff = sharedPreferences.getBoolean(SETTING_ON_OFF, true);
-        model = sharedPreferences.getInt(SETTING_MODEL, 1);
-        vibrationStrength = sharedPreferences.getInt(SETTING_VIBRATION_STRENGTH, 50);
         autoHideInTask = sharedPreferences.getBoolean(SETTING_AUTO_HIDE_IN_TASK, true);
         onlyEffectInScreenOff = sharedPreferences.getBoolean(SETTING_ONLY_EFFECT_IN_SCREEN_OFF, false);
+        vibrationStrength = sharedPreferences.getInt(SETTING_VIBRATION_STRENGTH, 50);
+        longPressTime = sharedPreferences.getInt(SETTING_LONG_PRESS_TIME, 800);
     }
 
     public void setOnOff(boolean onOff) {
         this.onOff = onOff;
         sharedPreferences.edit().putBoolean(SETTING_ON_OFF, onOff).apply();
-        if (MyAccessibilityService.mainFunction != null) {
-            MyAccessibilityService.mainFunction.setInOnOff(onOff);
+        if (MyAccessibilityService.myMainFunction != null) {
+            MyAccessibilityService.myMainFunction.setInOnOff(onOff);
         }
-    }
-
-    public void setModel(int model) {
-        this.model = model;
-        sharedPreferences.edit().putInt(SETTING_MODEL, model).apply();
-    }
-
-    public void setVibrationStrength(int vibrationStrength) {
-        this.vibrationStrength = vibrationStrength;
-        sharedPreferences.edit().putInt(SETTING_VIBRATION_STRENGTH, vibrationStrength).apply();
     }
 
     public void setAutoHideInTask(boolean autoHideInTask) {
@@ -53,8 +43,18 @@ public class SettingData {
     public void setOnlyEffectInScreenOff(boolean onlyEffectInScreenOff) {
         this.onlyEffectInScreenOff = onlyEffectInScreenOff;
         sharedPreferences.edit().putBoolean(SETTING_ONLY_EFFECT_IN_SCREEN_OFF, onlyEffectInScreenOff).apply();
-        if (MyAccessibilityService.mainFunction != null) {
-            MyAccessibilityService.mainFunction.setInOnlyEffectInScreenOffOnOff(onlyEffectInScreenOff);
+        if (MyAccessibilityService.myMainFunction != null) {
+            MyAccessibilityService.myMainFunction.setInOnlyEffectInScreenOffOnOff(onlyEffectInScreenOff);
         }
+    }
+
+    public void setVibrationStrength(int vibrationStrength) {
+        this.vibrationStrength = vibrationStrength;
+        sharedPreferences.edit().putInt(SETTING_VIBRATION_STRENGTH, vibrationStrength).apply();
+    }
+
+    public void setLongPressTime(int longPressTime) {
+        this.longPressTime = longPressTime;
+        sharedPreferences.edit().putInt(SETTING_LONG_PRESS_TIME, longPressTime).apply();
     }
 }
