@@ -306,7 +306,7 @@
                         android:textColor="@color/textColor"
                         android:textSize="15sp" />
 
-                    <SeekBar
+                    <com.lgh.volume.control.MySeekBar
                         android:id="@+id/sb_long_press_time"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -314,12 +314,13 @@
                         android:layout_centerVertical="true"
                         android:layout_toEndOf="@+id/tv_long_press_time"
                         android:max="2000"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="0dp"
-                        android:progressDrawable="@drawable/seek_bar_bg"
+                        android:background="@drawable/seekbar_bg"
+                        android:paddingStart="7.5dp"
+                        android:paddingEnd="7.5dp"
+                        android:progressDrawable="@drawable/seekbar_progress_bg"
                         android:splitTrack="false"
-                        android:thumb="@drawable/seek_bar_thumb"
-                        android:thumbOffset="0dp" />
+                        android:thumb="@drawable/seekbar_thumb_normal"
+                        android:thumbOffset="7.5dp" />
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -339,7 +340,7 @@
                         android:textColor="@color/textColor"
                         android:textSize="15sp" />
 
-                    <SeekBar
+                    <com.lgh.volume.control.MySeekBar
                         android:id="@+id/sb_vibration_strength"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -347,12 +348,13 @@
                         android:layout_centerVertical="true"
                         android:layout_toEndOf="@+id/tv_vibration_strength"
                         android:max="100"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="0dp"
-                        android:progressDrawable="@drawable/seek_bar_bg"
+                        android:background="@drawable/seekbar_bg"
+                        android:paddingStart="7.5dp"
+                        android:paddingEnd="7.5dp"
+                        android:progressDrawable="@drawable/seekbar_progress_bg"
                         android:splitTrack="false"
-                        android:thumb="@drawable/seek_bar_thumb"
-                        android:thumbOffset="0dp" />
+                        android:thumb="@drawable/seekbar_thumb_normal"
+                        android:thumbOffset="7.5dp" />
                 </RelativeLayout>
 
             </LinearLayout>
