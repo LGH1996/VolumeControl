@@ -20,6 +20,20 @@ android {
     buildFeatures {
         viewBinding true
     }
+    signingConfigs {
+        release {
+            keyAlias '*'
+            keyPassword '*'
+            storeFile file('../VolumeControl.jks')
+            storePassword '*'
+        }
+        debug {
+            keyAlias '*'
+            keyPassword '*'
+            storeFile file('../VolumeControl.jks')
+            storePassword '*'
+        }
+    }
 }
 
 dependencies {

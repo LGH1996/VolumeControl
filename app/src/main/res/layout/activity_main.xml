@@ -347,7 +347,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:layout_toEndOf="@+id/tv_vibration_strength"
-                        android:max="100"
+                        android:max="200"
                         android:background="@drawable/seekbar_bg"
                         android:paddingStart="7.5dp"
                         android:paddingEnd="7.5dp"
