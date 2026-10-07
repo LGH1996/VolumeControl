@@ -1,11 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 33
+    namespace "com.lgh.volume.control"
     defaultConfig {
         applicationId "com.lgh.volume.control"
-        minSdkVersion 23
-        targetSdkVersion 33
+        compileSdk 36
+        minSdkVersion 24
+        targetSdkVersion 36
         versionCode 14
         versionName "1.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
